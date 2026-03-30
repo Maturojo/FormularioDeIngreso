@@ -1,7 +1,7 @@
-import { initDb } from './jsonDb.js';
-import { createApp } from './createApp.js';
+import { initDb } from './mongoDb.js';
+import { createMongoApp } from './createMongoApp.js';
 
-const app = createApp();
+const app = createMongoApp();
 const PORT = Number(process.env.PORT || 4001);
 
 initDb().then(() => {

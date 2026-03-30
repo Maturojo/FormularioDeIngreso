@@ -6,23 +6,25 @@ function toLocalDate(dateValue) {
 }
 
 export function mapCouponRow(row) {
+  const lead = row.lead || {};
+
   return {
-    id: row.id,
+    id: row.id || row._id?.toString(),
     code: row.code,
     status: row.status,
     statusLabel: row.status === 'redeemed' ? 'Canjeado / bloqueado' : 'Activo',
     discountLabel: row.discountLabel,
     redeemedBy: row.redeemedBy,
-    createdAt: row.createdAt,
+    createdAt: new Date(row.createdAt).toISOString(),
     createdAtLabel: toLocalDate(row.createdAt),
-    redeemedAt: row.redeemedAt,
+    redeemedAt: row.redeemedAt ? new Date(row.redeemedAt).toISOString() : null,
     lead: {
-      id: row.lead.id,
-      fullName: row.lead.fullName,
-      email: row.lead.email,
-      phone: row.lead.phone,
-      city: row.lead.city,
-      notes: row.lead.notes
+      id: lead.id || lead._id?.toString(),
+      fullName: lead.fullName || 'Lead sin datos',
+      email: lead.email || '',
+      phone: lead.phone || '',
+      city: lead.city || '',
+      notes: lead.notes || ''
     }
   };
 }

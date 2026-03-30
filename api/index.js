@@ -1,5 +1,5 @@
-import { createApp } from '../server/createApp.js';
+import { createMongoApp } from '../server/createMongoApp.js';
 
-const app = createApp();
+const app = createMongoApp();
 
 export default app;
