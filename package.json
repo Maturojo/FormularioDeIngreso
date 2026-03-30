@@ -6,10 +6,10 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:client": "vite",
-    "dev:server": "node --watch server/app.js",
+    "dev:server": "node --watch server/devServer.js",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "node server/app.js",
+    "start": "node server/devServer.js",
     "db:init": "node server/initJsonDb.js"
   },
   "dependencies": {

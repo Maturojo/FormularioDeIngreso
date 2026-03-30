@@ -11,6 +11,10 @@ function resolveDbPath() {
     return process.env.DB_PATH;
   }
 
+  if (process.env.VERCEL) {
+    return '/tmp/formulario-ingreso-data.json';
+  }
+
   return path.join(__dirname, 'storage', 'data.json');
 }
 

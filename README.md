@@ -29,6 +29,8 @@ npm run dev
 - Frontend: `http://localhost:5173`
 - API: `http://localhost:4001`
 
+En local, Vite redirige `/api` automáticamente al backend.
+
 ## Base de datos
 
 La base de datos se crea automáticamente en:
@@ -42,3 +44,5 @@ También podés inicializarla manualmente con:
 ```bash
 npm run db:init
 ```
+
+En Vercel preview, la base se guarda temporalmente en `/tmp`, así que sirve para pruebas pero no como persistencia definitiva.

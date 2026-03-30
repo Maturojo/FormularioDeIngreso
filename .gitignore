@@ -8,3 +8,5 @@ server/storage/*.sqlite
 server/storage/*.sqlite-journal
 server/storage/test.txt
 server/storage/data.json
+
+.vercel
