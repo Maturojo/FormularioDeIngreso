@@ -17,6 +17,8 @@ function getClient() {
   if (!clientPromise) {
     const uri = getRequiredEnv('MONGODB_URI');
     const client = new MongoClient(uri, {
+      connectTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 10000,
       serverApi: {
         version: ServerApiVersion.v1,
         strict: true,

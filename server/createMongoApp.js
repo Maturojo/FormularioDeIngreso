@@ -6,6 +6,8 @@ import { mapCouponRow } from './jsonFormatters.js';
 
 export function createMongoApp() {
   const app = express();
+  const asyncHandler = (handler) => (request, response, next) =>
+    Promise.resolve(handler(request, response, next)).catch(next);
 
   app.use(cors());
   app.use(express.json());
@@ -24,7 +26,7 @@ export function createMongoApp() {
     response.json({ ok: true, database: 'mongodb' });
   });
 
-  app.post('/api/leads', async (request, response) => {
+  app.post('/api/leads', asyncHandler(async (request, response) => {
     const db = await initDb();
     const { fullName, email, phone, city = '', notes = '' } = request.body || {};
 
@@ -62,9 +64,9 @@ export function createMongoApp() {
         error: 'No se pudieron guardar los datos.'
       });
     }
-  });
+  }));
 
-  app.get('/api/coupons/:code', async (request, response) => {
+  app.get('/api/coupons/:code', asyncHandler(async (request, response) => {
     const db = await initDb();
     const coupon = await db.collection('coupons').findOne({ code: request.params.code });
 
@@ -73,9 +75,9 @@ export function createMongoApp() {
     }
 
     return response.json({ coupon: await buildCouponWithLead(db, coupon) });
-  });
+  }));
 
-  app.post('/api/coupons/:code/redeem', async (request, response) => {
+  app.post('/api/coupons/:code/redeem', asyncHandler(async (request, response) => {
     const db = await initDb();
     const coupon = await db.collection('coupons').findOne({ code: request.params.code });
 
@@ -100,9 +102,9 @@ export function createMongoApp() {
 
     const updatedCoupon = await db.collection('coupons').findOne({ _id: coupon._id });
     return response.json({ coupon: await buildCouponWithLead(db, updatedCoupon) });
-  });
+  }));
 
-  app.get('/api/dashboard', async (_request, response) => {
+  app.get('/api/dashboard', asyncHandler(async (_request, response) => {
     const db = await initDb();
 
     const [totalLeads, activeCoupons, redeemedCoupons, recentCouponsRaw] = await Promise.all([
@@ -121,6 +123,13 @@ export function createMongoApp() {
         redeemedCoupons
       },
       recentCoupons
+    });
+  }));
+
+  app.use((error, _request, response, _next) => {
+    console.error(error);
+    response.status(500).json({
+      error: 'No se pudo conectar con MongoDB.'
     });
   });
 
