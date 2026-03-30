@@ -161,6 +161,26 @@ button:disabled {
 .actions {
   display: flex;
   gap: 12px;
+  flex-wrap: wrap;
+}
+
+.camera-scanner {
+  margin-top: 18px;
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: rgba(255, 250, 244, 0.92);
+  padding: 14px;
+}
+
+.camera-scanner video {
+  border-radius: 18px;
+}
+
+.camera-scanner button,
+.camera-scanner select,
+.camera-scanner input {
+  margin-top: 8px;
 }
 
 .status {

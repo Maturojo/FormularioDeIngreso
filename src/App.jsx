@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { createLead, fetchDashboard, lookupCoupon, redeemCoupon } from './api';
+
+const CouponCameraScanner = lazy(() => import('./components/CouponCameraScanner'));
 
 const emptyForm = {
   fullName: '',
@@ -16,6 +18,7 @@ export default function App() {
   const [couponCode, setCouponCode] = useState('');
   const [couponResult, setCouponResult] = useState(null);
   const [scannerStatus, setScannerStatus] = useState({ type: '', message: '' });
+  const [cameraEnabled, setCameraEnabled] = useState(false);
   const [dashboard, setDashboard] = useState(null);
   const [loadingDashboard, setLoadingDashboard] = useState(true);
 
@@ -58,17 +61,31 @@ export default function App() {
     }
   }
 
-  async function handleLookup(event) {
-    event.preventDefault();
+  async function runLookup(code) {
     setScannerStatus({ type: '', message: '' });
     setCouponResult(null);
 
     try {
-      const data = await lookupCoupon(couponCode.trim());
+      const data = await lookupCoupon(code);
       setCouponResult(data.coupon);
     } catch (error) {
       setScannerStatus({ type: 'error', message: error.message });
     }
+  }
+
+  async function handleLookup(event) {
+    event.preventDefault();
+    await runLookup(couponCode.trim());
+  }
+
+  async function handleCameraDetected(rawCode) {
+    const normalizedCode = rawCode.trim().toUpperCase();
+    setCouponCode(normalizedCode);
+    setScannerStatus({
+      type: 'success',
+      message: `Código detectado: ${normalizedCode}`
+    });
+    await runLookup(normalizedCode);
   }
 
   async function handleRedeem() {
@@ -93,7 +110,7 @@ export default function App() {
     <main className="page-shell">
       <section className="hero">
         <p className="eyebrow">Sur Maderas</p>
-        <h1>Formulario de toma de datos con cupones únicos y lector de canje</h1>
+        <h1>Formulario de ingreso al sistema</h1>
         <p className="hero-copy">
           Registrá datos para ingresar al sistema, entregá un cupón irrepetible y validalo desde el
           panel del lector para evitar usos duplicados.
@@ -201,6 +218,13 @@ export default function App() {
               <button
                 type="button"
                 className="ghost"
+                onClick={() => setCameraEnabled((current) => !current)}
+              >
+                {cameraEnabled ? 'Cerrar cámara' : 'Abrir cámara'}
+              </button>
+              <button
+                type="button"
+                className="ghost"
                 onClick={handleRedeem}
                 disabled={!couponResult || couponResult.status === 'redeemed'}
               >
@@ -208,6 +232,19 @@ export default function App() {
               </button>
             </div>
           </form>
+
+          <Suspense fallback={cameraEnabled ? <p className="muted">Cargando lector de cámara...</p> : null}>
+            <CouponCameraScanner
+              active={cameraEnabled}
+              onDetected={handleCameraDetected}
+              onError={() => {
+                setScannerStatus({
+                  type: 'error',
+                  message: 'No se pudo cerrar correctamente el lector de cámara.'
+                });
+              }}
+            />
+          </Suspense>
 
           {scannerStatus.message ? (
             <p className={`status ${scannerStatus.type}`}>{scannerStatus.message}</p>
