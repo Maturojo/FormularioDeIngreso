@@ -1,5 +1,6 @@
 import { Suspense, lazy, useEffect, useState } from 'react';
 import { createLead, fetchDashboard, lookupCoupon, redeemCoupon } from './api';
+import CouponVisualCodes from './components/CouponVisualCodes';
 
 const CouponCameraScanner = lazy(() => import('./components/CouponCameraScanner'));
 
@@ -192,6 +193,7 @@ export default function App() {
               <span>Cupón generado</span>
               <strong>{createdCoupon.code}</strong>
               <small>Descuento: {createdCoupon.discountLabel}</small>
+              <CouponVisualCodes code={createdCoupon.code} label="QR del cupón" />
             </div>
           ) : null}
         </article>
@@ -251,32 +253,35 @@ export default function App() {
           ) : null}
 
           {couponResult ? (
-            <div className="coupon-details">
-              <div>
-                <span>Estado</span>
-                <strong>{couponResult.statusLabel}</strong>
+            <>
+              <div className="coupon-details">
+                <div>
+                  <span>Estado</span>
+                  <strong>{couponResult.statusLabel}</strong>
+                </div>
+                <div>
+                  <span>Cliente</span>
+                  <strong>{couponResult.lead.fullName}</strong>
+                </div>
+                <div>
+                  <span>Email</span>
+                  <strong>{couponResult.lead.email}</strong>
+                </div>
+                <div>
+                  <span>Descuento</span>
+                  <strong>{couponResult.discountLabel}</strong>
+                </div>
+                <div>
+                  <span>Creado</span>
+                  <strong>{couponResult.createdAtLabel}</strong>
+                </div>
+                <div>
+                  <span>Canjeado por</span>
+                  <strong>{couponResult.redeemedBy || 'Pendiente'}</strong>
+                </div>
               </div>
-              <div>
-                <span>Cliente</span>
-                <strong>{couponResult.lead.fullName}</strong>
-              </div>
-              <div>
-                <span>Email</span>
-                <strong>{couponResult.lead.email}</strong>
-              </div>
-              <div>
-                <span>Descuento</span>
-                <strong>{couponResult.discountLabel}</strong>
-              </div>
-              <div>
-                <span>Creado</span>
-                <strong>{couponResult.createdAtLabel}</strong>
-              </div>
-              <div>
-                <span>Canjeado por</span>
-                <strong>{couponResult.redeemedBy || 'Pendiente'}</strong>
-              </div>
-            </div>
+              <CouponVisualCodes code={couponResult.code} label="QR del cupón consultado" />
+            </>
           ) : (
             <p className="muted">
               Ingresá un código para revisar si está activo o si ya fue utilizado.
